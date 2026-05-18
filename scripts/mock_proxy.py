@@ -4,15 +4,15 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import urllib.request
 from dotenv import load_dotenv
 
-load_dotenv()
+# Load .env only if it exists (for local development)
+if os.path.exists(".env"):
+    load_dotenv()
 
 BACKEND_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
-# Original API Key found in history as fallback for restricted ADC projects
-FALLBACK_API_KEY = "AIzaSyB5X3MDs1UB6x3BLjAuxgjNwKqCKL85kG4"
 
 def get_api_key():
     """Retrieves the API Key from environment variables."""
-    return os.getenv("GOOGLE_API_KEY")
+    return os.environ.get("GOOGLE_API_KEY")
 
 class LobsterTrapMock(BaseHTTPRequestHandler):
     def do_POST(self):

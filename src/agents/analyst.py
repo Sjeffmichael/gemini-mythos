@@ -24,16 +24,21 @@ def analyst_node(state: AgentState) -> AgentState:
     current_batch = state["interest_areas"][:5] # Batch of 5 files for deep context
     remaining_files = state["interest_areas"][5:]
     
-    model_name = "gemini-2.5-pro" # Switched to 2.5 Pro for deep reasoning with better rate limits
+    model_name = "gemini-2.5-flash" # Switched to 2.5 Flash to avoid rate limits
+    
+    api_key = os.environ.get("GOOGLE_API_KEY")
+    if not api_key:
+        raise ValueError("CRITICAL ERROR: GOOGLE_API_KEY is not set in the environment variables.")
+
     llm = ChatOpenAI(
         model=model_name,
-        openai_api_key=os.getenv("GOOGLE_API_KEY"),
+        openai_api_key=api_key,
         base_url="http://localhost:8081/v1",
         extra_body={
             "_lobstertrap": {
                 "declared_intent": "cross_file_logic_audit",
                 "declared_paths": current_batch,
-                "agent_id": "analyst-pro-v1"
+                "agent_id": "analyst-flash-v1"
             }
         }
     )

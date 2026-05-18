@@ -1,3 +1,14 @@
+---
+title: Gemini Mythos
+emoji: 🛡️
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+app_file: ui/app.py
+pinned: false
+---
+
 # 🛡️ Gemini Mythos
 
 **Team:** Invencible  
@@ -25,7 +36,7 @@ We utilize LangGraph to orchestrate a deterministic, 5-stage state machine that 
 | **1** | **The Scout** | `gemini-3.1-flash-lite` | Ultra-fast mapping of the attack surface. Identifies files handling untrusted input, auth, and memory management. |
 | **2** | **The Analyst** | `gemini-2.5-pro` | Performs a "Full-Brain" deep-logic audit across batches of files to catch complex, cross-file vulnerabilities (e.g., SSRF, Prompt Injection, RCE). |
 | **3** | **The Validator** | `gemini-2.5-flash` | Acts as the Skeptical "Devil's Advocate". Peer-reviews findings to eliminate false positives and ensure the logic flaw is genuinely exploitable at the code level. |
-| **4** | **The Oracle** | `gemini-2.0-flash-lite` | The Autonomous Exploit Oracle. Generates a Python Proof-of-Concept (PoC) script and executes it in a sandboxed environment to empirically prove the exploit. |
+| **4** | **The Oracle** | `gemini-3.1-flash-lite` | The Autonomous Exploit Oracle. Generates a Python Proof-of-Concept (PoC) script and executes it in a sandboxed environment to empirically prove the exploit. |
 | **5** | **The Remediator** | `gemini-2.5-flash` | Generates a secure, Git-compatible patch (Diff) and validation unit tests. |
 
 ---

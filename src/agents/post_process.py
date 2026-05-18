@@ -5,6 +5,7 @@ from typing import List, Optional
 from langchain_openai import ChatOpenAI
 from src.state import AgentState, VulnerabilityReport
 from pydantic import BaseModel, Field
+from src.utils.cost import calculate_cost
 
 class ValidationResult(BaseModel):
     is_valid: bool
@@ -18,9 +19,13 @@ def validator_node(state: AgentState) -> AgentState:
     if not state["vulnerability_reports"]:
         return state
 
+    api_key = os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        raise ValueError("CRITICAL ERROR: GOOGLE_API_KEY is not set in the environment variables (Validator).")
+
     llm = ChatOpenAI(
         model="gemini-2.5-flash", # Switched to 2.5 Flash for reliable validation
-        openai_api_key=os.getenv("GOOGLE_API_KEY"),
+        openai_api_key=api_key,
         base_url="http://localhost:8081/v1",
         extra_body={
             "_lobstertrap": {
@@ -33,6 +38,7 @@ def validator_node(state: AgentState) -> AgentState:
     
     updated_reports = []
     audit_log = list(state["audit_log"])
+    total_node_cost = 0.0
     
     for report in state["vulnerability_reports"]:
         if report.get("is_validated"):
@@ -61,6 +67,7 @@ def validator_node(state: AgentState) -> AgentState:
         
         try:
             result = structured_llm.invoke(prompt)
+            total_node_cost += calculate_cost("gemini-2.5-flash", len(prompt)//4, 200)
             if result.is_valid:
                 report["is_validated"] = True
                 updated_reports.append(report)
@@ -73,7 +80,8 @@ def validator_node(state: AgentState) -> AgentState:
 
     return {
         "vulnerability_reports": updated_reports,
-        "audit_log": audit_log
+        "audit_log": audit_log,
+        "total_cost": state.get("total_cost", 0) + total_node_cost
     }
 
 class OracleResult(BaseModel):
@@ -85,9 +93,13 @@ def oracle_node(state: AgentState) -> AgentState:
     Oracle Agent (Gemini 2.0 Flash Lite):
     Generates and executes a Python PoC script in a sandboxed environment.
     """
+    api_key = os.environ.get("GOOGLE_API_KEY")
+    if not api_key:
+        raise ValueError("CRITICAL ERROR: GOOGLE_API_KEY is not set in the environment variables (Oracle).")
+
     llm = ChatOpenAI(
-        model="gemini-2.0-flash-lite", # Efficient generation for PoCs
-        openai_api_key=os.getenv("GOOGLE_API_KEY"),
+        model="gemini-3.1-flash-lite", # Efficient generation for PoCs
+        openai_api_key=api_key,
         base_url="http://localhost:8081/v1",
         extra_body={
             "_lobstertrap": {
@@ -100,6 +112,7 @@ def oracle_node(state: AgentState) -> AgentState:
     
     updated_reports = []
     audit_log = list(state["audit_log"])
+    total_node_cost = 0.0
     
     for report in state["vulnerability_reports"]:
         if report.get("poc_script") or not report.get("is_validated"):
@@ -117,6 +130,7 @@ def oracle_node(state: AgentState) -> AgentState:
         
         try:
             result = structured_llm.invoke(prompt)
+            total_node_cost += calculate_cost("gemini-3.1-flash-lite", len(prompt)//4, 500)
             report["poc_script"] = result.poc_script
             
             # --- "Autonomous Exploit Oracle" Execution Phase ---
@@ -147,7 +161,8 @@ def oracle_node(state: AgentState) -> AgentState:
 
     return {
         "vulnerability_reports": updated_reports,
-        "audit_log": audit_log
+        "audit_log": audit_log,
+        "total_cost": state.get("total_cost", 0) + total_node_cost
     }
 
 class RemediatorResult(BaseModel):
@@ -160,9 +175,13 @@ def remediator_node(state: AgentState) -> AgentState:
     Remediator Agent (Gemini 2.5 Flash):
     Generates a Git-compatible patch (Diff) and validation unit tests.
     """
+    api_key = os.environ.get("GOOGLE_API_KEY")
+    if not api_key:
+        raise ValueError("CRITICAL ERROR: GOOGLE_API_KEY is not set in the environment variables (Remediator).")
+
     llm = ChatOpenAI(
         model="gemini-2.5-flash", # Capable coding model for patches
-        openai_api_key=os.getenv("GOOGLE_API_KEY"),
+        openai_api_key=api_key,
         base_url="http://localhost:8081/v1",
         extra_body={
             "_lobstertrap": {
@@ -175,6 +194,7 @@ def remediator_node(state: AgentState) -> AgentState:
     
     updated_reports = []
     audit_log = list(state["audit_log"])
+    total_node_cost = 0.0
     
     for report in state["vulnerability_reports"]:
         if report.get("patch_diff"):
@@ -193,6 +213,7 @@ def remediator_node(state: AgentState) -> AgentState:
         
         try:
             result = structured_llm.invoke(prompt)
+            total_node_cost += calculate_cost("gemini-2.5-flash", len(prompt)//4, 800)
             report["patch_diff"] = result.patch_diff
             report["validation_tests"] = result.validation_tests
             updated_reports.append(report)
@@ -203,5 +224,6 @@ def remediator_node(state: AgentState) -> AgentState:
 
     return {
         "vulnerability_reports": updated_reports,
-        "audit_log": audit_log
+        "audit_log": audit_log,
+        "total_cost": state.get("total_cost", 0) + total_node_cost
     }
