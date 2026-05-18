@@ -1,0 +1,11 @@
+services:
+  gemini-mythos:
+    build: .
+    ports:
+      - "8501:8501"
+      - "8080:8080"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    restart: unless-stopped
