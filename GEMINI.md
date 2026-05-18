@@ -34,7 +34,7 @@ While Anthropic focuses on the raw power of a single frontier model, Gemini Myth
 | **Stage 1** | **The Scout** | `gemini-3.1-flash-lite` | Rapidly maps the attack surface and entry points. |
 | **Stage 2** | **The Analyst** | `gemini-2.5-pro` | Deep-logic audit of integer arithmetic and state logic. |
 | **Stage 3** | **The Validator** | `gemini-2.5-flash` | Peer-reviews findings to eliminate false positives. |
-| **Stage 4** | **The Oracle** | `gemini-2.0-flash-lite` | Generates and executes a PoC script in a sandbox. |
+| **Stage 4** | **The Oracle** | `gemini-3.1-flash-lite` | Generates and executes a PoC script in a sandbox. |
 | **Stage 5** | **The Remediator** | `gemini-2.5-flash` | Generates side-by-side patches and unit tests. |
 
 ---

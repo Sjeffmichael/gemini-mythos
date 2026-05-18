@@ -15,9 +15,14 @@ def scout_node(state: AgentState) -> AgentState:
     Identifies high-risk files. Traffic is routed through Lobster Trap for governance.
     """
     model_name = "gemini-3.1-flash-lite"
+    
+    api_key = os.environ.get("GOOGLE_API_KEY")
+    if not api_key:
+        raise ValueError("CRITICAL ERROR: GOOGLE_API_KEY is not set in the environment variables.")
+
     llm = ChatOpenAI(
         model=model_name, 
-        openai_api_key=os.getenv("GOOGLE_API_KEY"),
+        openai_api_key=api_key,
         base_url="http://localhost:8081/v1",
         extra_body={
             "_lobstertrap": {

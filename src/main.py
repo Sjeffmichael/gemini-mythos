@@ -5,8 +5,11 @@ from src.agents.scout import scout_node
 from src.agents.analyst import analyst_node
 from src.agents.post_process import validator_node, oracle_node, remediator_node
 from dotenv import load_dotenv
+import os
 
-load_dotenv()
+# Load .env only if it exists (for local development)
+if os.path.exists(".env"):
+    load_dotenv()
 
 MAX_RECURSION = 10
 MAX_BUDGET = 20.0  # Hard limit in USD

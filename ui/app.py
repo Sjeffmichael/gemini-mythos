@@ -5,7 +5,6 @@ import git
 from src.main import build_graph
 from src.state import AgentState
 import pandas as pd
-import time
 
 import plotly.graph_objects as go
 

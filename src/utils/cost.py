@@ -7,7 +7,6 @@ def calculate_cost(model_name: str, input_tokens: int, output_tokens: int) -> fl
         "gemini-3.1-flash-lite": {"input": 0.075 / 1_000_000, "output": 0.30 / 1_000_000},
         "gemini-2.5-pro": {"input": 1.25 / 1_000_000, "output": 5.00 / 1_000_000},
         "gemini-2.5-flash": {"input": 0.10 / 1_000_000, "output": 0.40 / 1_000_000},
-        "gemini-2.0-flash-lite": {"input": 0.075 / 1_000_000, "output": 0.30 / 1_000_000},
     }
     
     # Fallback logic
